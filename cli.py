@@ -17,7 +17,18 @@ from pathlib import Path
 from typing import Optional
 
 from predictor import MatchPredictor
-from utils import format_match_table, format_odds_table, format_prediction_output, Colors
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent))
+from utils import format_match_table, format_odds_table, format_prediction_output
+
+class Colors:
+    RESET = '\033[0m'
+    BOLD = '\033[1m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    CYAN = '\033[36m'
 
 
 def setup_parser() -> argparse.ArgumentParser:

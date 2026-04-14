@@ -57,7 +57,8 @@ class MatchPredictor:
             merged_file = self.data_dir / "merged" / f"matches_{date_str}.json"
             if merged_file.exists():
                 with open(merged_file, 'r', encoding='utf-8') as f:
-                    self._cache[date_str] = json.load(f)
+                    data = json.load(f)
+                    self._cache[date_str] = data.get('matches', [])
             else:
                 self._cache[date_str] = []
         return self._cache[date_str]

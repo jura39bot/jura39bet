@@ -1,0 +1,132 @@
+{
+  "date": "2026-04-14",
+  "matches": [
+    {
+      "id": "match_001",
+      "league": "Champions League",
+      "home_team": "PSG",
+      "away_team": "Liverpool",
+      "kickoff": "2026-04-14T21:00:00+02:00",
+      "status": "scheduled",
+      "home_form": [
+        {"result": "V", "goals_for": 3, "goals_against": 1, "opponent": "Marseille"},
+        {"result": "V", "goals_for": 2, "goals_against": 0, "opponent": "Lyon"},
+        {"result": "D", "goals_for": 1, "goals_against": 1, "opponent": "Monaco"},
+        {"result": "V", "goals_for": 4, "goals_against": 1, "opponent": "Nice"},
+        {"result": "V", "goals_for": 2, "goals_against": 0, "opponent": "Lille"}
+      ],
+      "away_form": [
+        {"result": "V", "goals_for": 3, "goals_against": 1, "opponent": "Man City"},
+        {"result": "D", "goals_for": 1, "goals_against": 1, "opponent": "Arsenal"},
+        {"result": "V", "goals_for": 2, "goals_against": 0, "opponent": "Chelsea"},
+        {"result": "D", "goals_for": 2, "goals_against": 2, "opponent": "Tottenham"},
+        {"result": "V", "goals_for": 3, "goals_against": 0, "opponent": "Newcastle"}
+      ],
+      "home_goals_scored_5": 12,
+      "home_goals_conceded_5": 3,
+      "away_goals_scored_5": 11,
+      "away_goals_conceded_5": 4,
+      "h2h": {
+        "matches": [
+          {"date": "2025-11-05", "home_team": "Liverpool", "away_team": "PSG", "home_score": 2, "away_score": 1},
+          {"date": "2024-03-13", "home_team": "PSG", "away_team": "Liverpool", "home_score": 0, "away_score": 1},
+          {"date": "2023-09-19", "home_team": "Liverpool", "away_team": "PSG", "home_score": 3, "away_score": 2}
+        ],
+        "team1_wins": 1,
+        "team2_wins": 2,
+        "draws": 0
+      },
+      "odds": {
+        "1": 2.45,
+        "X": 3.40,
+        "2": 2.80,
+        "bookmaker": "average"
+      }
+    },
+    {
+      "id": "match_002",
+      "league": "Champions League",
+      "home_team": "Real Madrid",
+      "away_team": "Bayern Munich",
+      "kickoff": "2026-04-14T21:00:00+02:00",
+      "status": "scheduled",
+      "home_form": [
+        {"result": "V", "goals_for": 3, "goals_against": 0, "opponent": "Barcelona"},
+        {"result": "V", "goals_for": 2, "goals_against": 1, "opponent": "Atletico"},
+        {"result": "V", "goals_for": 4, "goals_against": 0, "opponent": "Valencia"},
+        {"result": "D", "goals_for": 1, "goals_against": 1, "opponent": "Sevilla"},
+        {"result": "V", "goals_for": 3, "goals_against": 1, "opponent": "Villarreal"}
+      ],
+      "away_form": [
+        {"result": "V", "goals_for": 4, "goals_against": 1, "opponent": "Dortmund"},
+        {"result": "V", "goals_for": 3, "goals_against": 0, "opponent": "Leverkusen"},
+        {"result": "V", "goals_for": 2, "goals_against": 1, "opponent": "Leipzig"},
+        {"result": "V", "goals_for": 3, "goals_against": 1, "opponent": "Wolfsburg"},
+        {"result": "D", "goals_for": 1, "goals_against": 1, "opponent": "Frankfurt"}
+      ],
+      "home_goals_scored_5": 13,
+      "home_goals_conceded_5": 3,
+      "away_goals_scored_5": 13,
+      "away_goals_conceded_5": 4,
+      "h2h": {
+        "matches": [
+          {"date": "2024-05-08", "home_team": "Real Madrid", "away_team": "Bayern Munich", "home_score": 2, "away_score": 1},
+          {"date": "2024-04-30", "home_team": "Bayern Munich", "away_team": "Real Madrid", "home_score": 2, "away_score": 2}
+        ],
+        "team1_wins": 1,
+        "team2_wins": 0,
+        "draws": 1
+      },
+      "odds": {
+        "1": 2.10,
+        "X": 3.60,
+        "2": 3.20,
+        "bookmaker": "average"
+      }
+    },
+    {
+      "id": "match_003",
+      "league": "Premier League",
+      "home_team": "Arsenal",
+      "away_team": "Chelsea",
+      "kickoff": "2026-04-14T20:45:00+02:00",
+      "status": "scheduled",
+      "home_form": [
+        {"result": "V", "goals_for": 3, "goals_against": 0, "opponent": "Man Utd"},
+        {"result": "D", "goals_for": 1, "goals_against": 1, "opponent": "Liverpool"},
+        {"result": "V", "goals_for": 4, "goals_against": 1, "opponent": "West Ham"},
+        {"result": "V", "goals_for": 2, "goals_against": 0, "opponent": "Brentford"},
+        {"result": "V", "goals_for": 3, "goals_against": 1, "opponent": "Fulham"}
+      ],
+      "away_form": [
+        {"result": "D", "goals_for": 2, "goals_against": 2, "opponent": "Brighton"},
+        {"result": "V", "goals_for": 3, "goals_against": 2, "opponent": "Newcastle"},
+        {"result": "D", "goals_for": 1, "goals_against": 1, "opponent": "Aston Villa"},
+        {"result": "D", "goals_for": 0, "goals_against": 0, "opponent": "Everton"},
+        {"result": "V", "goals_for": 2, "goals_against": 1, "opponent": "Palace"}
+      ],
+      "home_goals_scored_5": 13,
+      "home_goals_conceded_5": 3,
+      "away_goals_scored_5": 8,
+      "away_goals_conceded_5": 6,
+      "h2h": {
+        "matches": [
+          {"date": "2025-11-10", "home_team": "Chelsea", "away_team": "Arsenal", "home_score": 1, "away_score": 1},
+          {"date": "2025-04-23", "home_team": "Arsenal", "away_team": "Chelsea", "home_score": 5, "away_score": 0},
+          {"date": "2024-10-21", "home_team": "Chelsea", "away_team": "Arsenal", "home_score": 2, "away_score": 2}
+        ],
+        "team1_wins": 1,
+        "team2_wins": 0,
+        "draws": 2
+      },
+      "odds": {
+        "1": 1.75,
+        "X": 3.80,
+        "2": 4.50,
+        "bookmaker": "average"
+      }
+    }
+  ],
+  "total_matches": 3,
+  "scraped_at": "2026-04-14T22:00:00+02:00"
+}
