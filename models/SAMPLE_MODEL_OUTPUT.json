@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-04-13T08:00:00Z",
+  "model_version": "1.0",
+  "value_bets": [
+    {
+      "match_id": "match_001",
+      "match": "Team A vs Team B",
+      "market": "Match Winner",
+      "selection": "Team A",
+      "bookmaker_odds": 2.40,
+      "implied_probability": 0.4167,
+      "model_probability": 0.48,
+      "expected_value": 0.152,
+      "ev_percent": "+15.2%",
+      "confidence": 3,
+      "meets_threshold": true,
+      "reasoning": "Strong home form (4W from last 5), away team missing key striker, historical H2H favours home side"
+    }
+  ],
+  "discarded_bets": [
+    {
+      "match": "Team C vs Team D",
+      "selection": "Team C Win",
+      "ev_percent": "+2.1%",
+      "meets_threshold": false,
+      "reason": "EV below 5% threshold"
+    }
+  ]
+}

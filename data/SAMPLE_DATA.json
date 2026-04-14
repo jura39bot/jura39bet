@@ -1,0 +1,29 @@
+{
+  "scraped_at": "2026-04-13T08:00:00Z",
+  "source": "OddsPortal + FBref",
+  "matches": [
+    {
+      "id": "match_001",
+      "league": "Premier League",
+      "home_team": "Team A",
+      "away_team": "Team B",
+      "kickoff": "2026-04-14T14:00:00Z",
+      "odds": {
+        "home_win": 2.40,
+        "draw": 3.20,
+        "away_win": 3.10
+      },
+      "recent_form": {
+        "home": ["W", "W", "D", "W", "W"],
+        "away": ["L", "D", "L", "W", "L"]
+      },
+      "head_to_head": {
+        "last_5": "3W-1D-1L for home team"
+      },
+      "key_stats": {
+        "home_goals_per_game": 2.1,
+        "away_goals_conceded_per_game": 1.8
+      }
+    }
+  ]
+}

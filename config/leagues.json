@@ -1,0 +1,22 @@
+{
+  "priority_1": {
+    "sport": "football",
+    "leagues": [
+      {"name": "Premier League", "country": "England", "source_id": "premier-league"},
+      {"name": "La Liga", "country": "Spain", "source_id": "la-liga"},
+      {"name": "Serie A", "country": "Italy", "source_id": "serie-a"},
+      {"name": "Ligue 1", "country": "France", "source_id": "ligue-1"}
+    ]
+  },
+  "priority_2": {
+    "sports": [
+      {"name": "Tennis", "competitions": ["ATP Tour", "WTA Tour"]},
+      {"name": "Basketball", "competitions": ["NBA", "EuroLeague"]},
+      {"name": "Road Cycling", "competitions": ["Grand Tours", "Monuments"]},
+      {"name": "MotoGP", "competitions": ["MotoGP Race Weekends"]}
+    ]
+  },
+  "ev_threshold": 0.05,
+  "min_odds": 1.50,
+  "max_odds": 10.0
+}

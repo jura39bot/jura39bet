@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetIntel — Sports Betting Intelligence</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #0f1117 100%);
+      border-bottom: 1px solid #2d3748;
+      padding: 0 2rem;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #63b3ed;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: #f6ad55; }
+    nav a {
+      color: #a0aec0;
+      text-decoration: none;
+      margin-left: 2rem;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: #e2e8f0; }
+
+    /* Hero */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #f7fafc;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 span { color: #63b3ed; }
+    .hero p {
+      font-size: 1.2rem;
+      color: #a0aec0;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(99, 179, 237, 0.1);
+      border: 1px solid rgba(99, 179, 237, 0.3);
+      color: #63b3ed;
+      padding: 0.3rem 1rem;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      background: #1a1f2e;
+      border-top: 1px solid #2d3748;
+      border-bottom: 1px solid #2d3748;
+    }
+    .stats-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      text-align: center;
+    }
+    .stat-item h3 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #63b3ed;
+    }
+    .stat-item p {
+      font-size: 0.85rem;
+      color: #718096;
+      margin-top: 0.25rem;
+    }
+
+    /* Content sections */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+    .section h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f7fafc;
+      margin-bottom: 2rem;
+    }
+
+    /* Sample report */
+    .report-card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .report-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #2d3748;
+    }
+    .report-title { font-size: 1.1rem; font-weight: 600; color: #f7fafc; }
+    .report-meta { font-size: 0.8rem; color: #718096; }
+    .ev-badge {
+      background: rgba(72, 187, 120, 0.15);
+      border: 1px solid rgba(72, 187, 120, 0.3);
+      color: #68d391;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    /* Picks table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      color: #718096;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #2d3748;
+    }
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1a1f2e;
+      color: #e2e8f0;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .stars { color: #f6ad55; }
+    .positive { color: #68d391; font-weight: 700; }
+
+    /* Pipeline */
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+    }
+    .pipeline-step {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    .pipeline-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #4a5568;
+      font-size: 1.2rem;
+    }
+    .agent-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .agent-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 0.5rem;
+    }
+    .agent-desc {
+      font-size: 0.75rem;
+      color: #718096;
+    }
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #68d391;
+      margin-right: 0.4rem;
+    }
+
+    /* Coverage */
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .coverage-card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .coverage-card h3 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #63b3ed;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
+    }
+    .coverage-card ul {
+      list-style: none;
+    }
+    .coverage-card li {
+      padding: 0.4rem 0;
+      font-size: 0.9rem;
+      color: #a0aec0;
+      border-bottom: 1px solid #2d3748;
+    }
+    .coverage-card li:last-child { border-bottom: none; }
+    .coverage-card li::before { content: '⚽ '; }
+    .coverage-card li.tennis::before { content: '🎾 '; }
+    .coverage-card li.basket::before { content: '🏀 '; }
+    .coverage-card li.cycling::before { content: '🚴 '; }
+    .coverage-card li.moto::before { content: '🏍️ '; }
+
+    /* Value prop */
+    .vp-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .vp-card {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 1.75rem;
+    }
+    .vp-icon { font-size: 1.75rem; margin-bottom: 1rem; }
+    .vp-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f7fafc;
+      margin-bottom: 0.5rem;
+    }
+    .vp-desc { font-size: 0.875rem; color: #a0aec0; }
+
+    /* Track record */
+    .track-record {
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid #2d3748;
+      padding: 2rem;
+      text-align: center;
+      color: #4a5568;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="logo">Bet<span>Intel</span></div>
+      <nav>
+        <a href="#reports">Reports</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#coverage">Coverage</a>
+        <a href="#track-record">Track Record</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="badge">Sports Betting Intelligence</div>
+    <h1>Value bets, <span>model-driven</span>,<br>delivered before kick-off.</h1>
+    <p>BetIntel uses quantitative EV analysis across 4 football leagues and secondary sports to surface picks with real edge — not gut feelings.</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <h3>+5%</h3>
+        <p>Minimum EV threshold</p>
+      </div>
+      <div class="stat-item">
+        <h3>2×</h3>
+        <p>Weekly reports</p>
+      </div>
+      <div class="stat-item">
+        <h3>4</h3>
+        <p>Football leagues</p>
+      </div>
+      <div class="stat-item">
+        <h3>100%</h3>
+        <p>Transparent track record</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="reports" class="section">
+    <h2>Sample Report — Weekend Preview</h2>
+    <div class="report-card">
+      <div class="report-header">
+        <div>
+          <div class="report-title">Weekend Preview — Premier League &amp; La Liga</div>
+          <div class="report-meta">Friday 18:00 · 3 value bets identified</div>
+        </div>
+        <div class="ev-badge">+5% EV minimum</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Match</th>
+            <th>Market</th>
+            <th>Selection</th>
+            <th>Odds</th>
+            <th>Model Prob.</th>
+            <th>EV</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Manchester City vs Arsenal</td>
+            <td>Match Winner</td>
+            <td>Man City</td>
+            <td>1.95</td>
+            <td>58%</td>
+            <td class="positive">+13.1%</td>
+            <td class="stars">★★★★</td>
+          </tr>
+          <tr>
+            <td>Real Madrid vs Atletico</td>
+            <td>Both Teams Score</td>
+            <td>Yes</td>
+            <td>1.80</td>
+            <td>62%</td>
+            <td class="positive">+11.6%</td>
+            <td class="stars">★★★</td>
+          </tr>
+          <tr>
+            <td>PSG vs Lyon</td>
+            <td>Over 2.5 Goals</td>
+            <td>Over</td>
+            <td>1.70</td>
+            <td>65%</td>
+            <td class="positive">+10.5%</td>
+            <td class="stars">★★★</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.8rem; color:#4a5568;">Sample data for illustration. Live reports contain real-time odds scraped within 24h of kick-off.</p>
+  </div>
+
+  <div id="pipeline" class="section" style="background:#0a0d14; padding: 4rem 0; max-width:100%;">
+    <div style="max-width:1100px; margin:0 auto; padding:0 2rem;">
+      <h2>Automated Pipeline</h2>
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="agent-icon">📊</div>
+          <div class="agent-name"><span class="status-dot"></span>Data Analyst</div>
+          <div class="agent-desc">Scrapes Sofascore, FBref, OddsPortal</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="agent-icon">🧠</div>
+          <div class="agent-name"><span class="status-dot"></span>Model Agent</div>
+          <div class="agent-desc">EV calculations, value bet identification</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="agent-icon">✍️</div>
+          <div class="agent-name"><span class="status-dot"></span>Writer</div>
+          <div class="agent-desc">Plain-language report drafting</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="agent-icon">🛡️</div>
+          <div class="agent-name"><span class="status-dot"></span>QA Agent</div>
+          <div class="agent-desc">Accuracy and consistency review</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="agent-icon">📬</div>
+          <div class="agent-name"><span class="status-dot"></span>Publisher</div>
+          <div class="agent-desc">Email &amp; Telegram distribution</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="coverage" class="section">
+    <h2>Coverage</h2>
+    <div class="coverage-grid">
+      <div class="coverage-card">
+        <h3>⚽ Football — Priority 1</h3>
+        <ul>
+          <li>Premier League (England)</li>
+          <li>La Liga (Spain)</li>
+          <li>Serie A (Italy)</li>
+          <li>Ligue 1 (France)</li>
+        </ul>
+      </div>
+      <div class="coverage-card">
+        <h3>🎾 Secondary Sports</h3>
+        <ul>
+          <li class="tennis">ATP / WTA Tour</li>
+          <li class="basket">NBA / EuroLeague</li>
+          <li class="cycling">Road Cycling — Grand Tours, Monuments</li>
+          <li class="moto">MotoGP Race Weekends</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0;">
+    <h2>Why BetIntel?</h2>
+    <div class="vp-grid">
+      <div class="vp-card">
+        <div class="vp-icon">📐</div>
+        <div class="vp-title">Model-driven, not gut-driven</div>
+        <div class="vp-desc">Every pick is backed by quantitative EV analysis. We only publish bets with at least +5% expected value.</div>
+      </div>
+      <div class="vp-card">
+        <div class="vp-icon">🔍</div>
+        <div class="vp-title">Quality-checked before publish</div>
+        <div class="vp-desc">A dedicated QA agent reviews every report for accuracy, odds currency, and pick consistency before it ships.</div>
+      </div>
+      <div class="vp-card">
+        <div class="vp-icon">📈</div>
+        <div class="vp-title">Transparent track record</div>
+        <div class="vp-desc">We publish our full historical results — wins and losses. You can verify our hit rate and ROI independently.</div>
+      </div>
+      <div class="vp-card">
+        <div class="vp-icon">⏰</div>
+        <div class="vp-title">Automated and reliable</div>
+        <div class="vp-desc">Reports arrive on schedule, every week. No missed match days, no last-minute delays.</div>
+      </div>
+      <div class="vp-card">
+        <div class="vp-icon">🌍</div>
+        <div class="vp-title">Multi-sport coverage</div>
+        <div class="vp-desc">Football is priority, but we cover tennis, basketball, cycling, and MotoGP with the same rigour.</div>
+      </div>
+      <div class="vp-card">
+        <div class="vp-icon">📝</div>
+        <div class="vp-title">Plain-language reasoning</div>
+        <div class="vp-desc">Every pick comes with a clear explanation. You understand the edge, not just the outcome.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="track-record" class="section" style="padding-top:0;">
+    <h2>Track Record</h2>
+    <div class="track-record">
+      <table>
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Picks</th>
+            <th>Wins</th>
+            <th>Hit Rate</th>
+            <th>ROI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>March 2026</td>
+            <td>12</td>
+            <td>7</td>
+            <td>58.3%</td>
+            <td class="positive">+14.2%</td>
+          </tr>
+          <tr>
+            <td>February 2026</td>
+            <td>10</td>
+            <td>6</td>
+            <td>60.0%</td>
+            <td class="positive">+11.8%</td>
+          </tr>
+          <tr>
+            <td>January 2026</td>
+            <td>8</td>
+            <td>5</td>
+            <td>62.5%</td>
+            <td class="positive">+18.4%</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:1rem; font-size:0.8rem; color:#4a5568;">Sample data. Live track record updated weekly with real results.</p>
+    </div>
+  </div>
+
+  <footer>
+    <strong style="color:#63b3ed;">BetIntel</strong> — Automated Sports Betting Intelligence<br>
+    <span>Pipeline: Data Analyst → Model Agent → Writer → QA Agent → Publisher</span>
+  </footer>
+
+</body>
+</html>
