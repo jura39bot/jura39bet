@@ -2,16 +2,19 @@
 Sofascore Scraper Module
 
 Récupère les statistiques d'équipes, forme récente et H2H depuis Sofascore.
+Utilise l'API directe avec fallback sur Selenium en cas de blocage (403).
 """
 
 import json
 import logging
 import time
 import random
+import re
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import requests
 from pathlib import Path
+from bs4 import BeautifulSoup
 
 # Import des utilitaires anti-détection
 import sys
@@ -25,16 +28,33 @@ from utils.scraper_utils import (
     parse_response_status
 )
 
+# Import Selenium fallback
+from selenium.webdriver.common.by import By
+
+try:
+    from scrapers.selenium_scraper import SeleniumScraper
+    SELENIUM_AVAILABLE = True
+except ImportError:
+    SELENIUM_AVAILABLE = False
+    logging.warning("SeleniumScraper not available, 403 errors will not have fallback")
+
 logger = logging.getLogger(__name__)
 
 
 class SofascoreScraper:
-    """Scraper pour récupérer les données depuis l'API Sofascore."""
+    """Scraper pour récupérer les données depuis l'API Sofascore avec fallback Selenium."""
     
-    def __init__(self, config_path: str = "config/sources.json"):
-        """Initialise le scraper avec la configuration."""
+    def __init__(self, config_path: str = "config/sources.json", use_selenium_fallback: bool = True):
+        """
+        Initialise le scraper avec la configuration.
+        
+        Args:
+            config_path: Chemin vers le fichier de configuration
+            use_selenium_fallback: Activer le fallback Selenium sur les erreurs 403
+        """
         self.config = self._load_config(config_path)
         self.base_url = self.config['sofascore']['api_url']
+        self.web_url = self.config['sofascore']['base_url']
         
         # Configuration retry
         self.retry_config = self.config.get('retry', {})
@@ -52,6 +72,13 @@ class SofascoreScraper:
         
         self.last_request_time = 0
         self.rate_limit_delay = self.config.get('rate_limit', {}).get('delay_between_requests', 1.0)
+        
+        # Selenium fallback
+        self.use_selenium_fallback = use_selenium_fallback and SELENIUM_AVAILABLE
+        self.selenium_scraper: Optional[SeleniumScraper] = None
+        
+        if self.use_selenium_fallback:
+            logger.info("Selenium fallback enabled for Sofascore")
         
     def _load_config(self, path: str) -> Dict:
         """Charge la configuration depuis le fichier JSON."""
@@ -88,6 +115,28 @@ class SofascoreScraper:
             logger.debug(f"Rate limiting: sleeping {sleep_time:.2f}s")
             time.sleep(sleep_time)
         self.last_request_time = time.time()
+    
+    def _init_selenium(self):
+        """Initialise le scraper Selenium si nécessaire."""
+        if not self.selenium_scraper and self.use_selenium_fallback:
+            try:
+                self.selenium_scraper = SeleniumScraper()
+                self.selenium_scraper.start()
+                logger.info("Selenium scraper initialized")
+            except Exception as e:
+                logger.error(f"Failed to initialize Selenium: {e}")
+                self.use_selenium_fallback = False
+    
+    def _close_selenium(self):
+        """Ferme le scraper Selenium."""
+        if self.selenium_scraper:
+            try:
+                self.selenium_scraper.quit()
+                logger.info("Selenium scraper closed")
+            except Exception as e:
+                logger.warning(f"Error closing Selenium: {e}")
+            finally:
+                self.selenium_scraper = None
     
     def _make_request(self, url: str, params: Optional[Dict] = None, attempt: int = 0) -> Optional[Dict]:
         """
@@ -127,12 +176,24 @@ class SofascoreScraper:
             # Gestion des codes d'erreur
             if response.status_code == 403:
                 logger.warning(f"403 Forbidden for {url} - attempt {attempt + 1}/{self.max_retries}")
+                
+                # Fallback sur Selenium si disponible
+                if self.use_selenium_fallback and attempt >= 1:
+                    logger.info("Switching to Selenium fallback for Sofascore...")
+                    return self._make_selenium_request(url)
+                
                 if attempt < self.max_retries - 1:
                     # Backoff exponentiel
                     delay = min(2 ** attempt, 30)
                     logger.info(f"Retrying in {delay}s...")
                     time.sleep(delay)
                     return self._make_request(url, params, attempt + 1)
+                
+                # Dernière tentative avec Selenium
+                if self.use_selenium_fallback:
+                    logger.info("Final attempt with Selenium fallback...")
+                    return self._make_selenium_request(url)
+                
                 return None
             
             if response.status_code == 429:
@@ -154,9 +215,210 @@ class SofascoreScraper:
                 logger.info(f"Retrying in {delay}s...")
                 time.sleep(delay)
                 return self._make_request(url, params, attempt + 1)
+            
+            # Fallback sur Selenium en cas d'erreur réseau
+            if self.use_selenium_fallback:
+                logger.info("Network error, trying Selenium fallback...")
+                return self._make_selenium_request(url)
+            
             return None
         except json.JSONDecodeError as e:
             logger.error(f"JSON decode error for {url}: {e}")
+            return None
+    
+    def _make_selenium_request(self, api_url: str) -> Optional[Dict]:
+        """
+        Fallback utilisant Selenium pour contourner le blocage 403.
+        
+        Args:
+            api_url: URL de l'API à scraper
+            
+        Returns:
+            Données JSON extraites ou None
+        """
+        if not SELENIUM_AVAILABLE:
+            logger.error("Selenium not available for fallback")
+            return None
+        
+        try:
+            self._init_selenium()
+            
+            if not self.selenium_scraper:
+                logger.error("Selenium scraper not initialized")
+                return None
+            
+            # Naviguer vers la page web correspondante
+            # L'API Sofascore nécessite souvent d'être sur le site web d'abord
+            web_url = api_url.replace('https://api.sofascore.com/api/v1', self.web_url)
+            
+            logger.info(f"Selenium navigating to: {web_url}")
+            
+            # Naviguer et attendre le chargement
+            success = self.selenium_scraper.navigate(
+                url=web_url,
+                wait_for="body",
+                wait_by=By.TAG_NAME,
+                timeout=20
+            )
+            
+            if not success:
+                logger.error("Selenium failed to load page")
+                return None
+            
+            # Prendre un screenshot pour debug
+            self.selenium_scraper.take_screenshot("sofascore_selenium")
+            
+            # Extraire les données via JavaScript
+            # Sofascore stocke souvent les données dans des variables globales
+            script = """
+                // Essayer de récupérer les données de différentes sources
+                if (window.__INITIAL_STATE__) {
+                    return window.__INITIAL_STATE__;
+                }
+                if (window.__DATA__) {
+                    return window.__DATA__;
+                }
+                // Chercher dans les scripts
+                const scripts = document.querySelectorAll('script');
+                for (let script of scripts) {
+                    const text = script.textContent;
+                    if (text.includes('window.__INITIAL_STATE__')) {
+                        const match = text.match(/window\.__INITIAL_STATE__\s*=\s*(\{.*?\});/);
+                        if (match) return JSON.parse(match[1]);
+                    }
+                }
+                return null;
+            """
+            
+            data = self.selenium_scraper.execute_script(script)
+            
+            if data:
+                logger.info("Data extracted via Selenium JavaScript")
+                return data
+            
+            # Fallback: parser le HTML
+            html = self.selenium_scraper.get_page_source()
+            return self._parse_sofascore_html(html)
+            
+        except Exception as e:
+            logger.error(f"Selenium fallback failed: {e}")
+            return None
+    
+    def _parse_sofascore_html(self, html: str) -> Optional[Dict]:
+        """
+        Parse le HTML de Sofascore pour extraire les données des matchs.
+        
+        Args:
+            html: Contenu HTML de la page
+            
+        Returns:
+            Dictionnaire avec les matchs extraits
+        """
+        try:
+            soup = BeautifulSoup(html, 'html.parser')
+            matches = []
+            
+            # Rechercher les cellules de match
+            match_cells = soup.select('[data-testid="event_cell"]')
+            
+            if not match_cells:
+                # Essayer d'autres sélecteurs
+                match_cells = soup.select('.event-cell, [class*="match"], [class*="event"]')
+            
+            logger.info(f"Found {len(match_cells)} match cells in HTML")
+            
+            for cell in match_cells:
+                try:
+                    match_data = self._extract_match_from_cell(cell)
+                    if match_data:
+                        matches.append(match_data)
+                except Exception as e:
+                    logger.debug(f"Error parsing match cell: {e}")
+                    continue
+            
+            return {'events': matches} if matches else None
+            
+        except Exception as e:
+            logger.error(f"Error parsing Sofascore HTML: {e}")
+            return None
+    
+    def _extract_match_from_cell(self, cell) -> Optional[Dict]:
+        """
+        Extrait les données d'un match depuis une cellule HTML.
+        
+        Args:
+            cell: Élément BeautifulSoup de la cellule
+            
+        Returns:
+            Données du match ou None
+        """
+        try:
+            # Extraire les noms des équipes
+            home_team_elem = cell.select_one('[data-testid="home-team-name"], .home-team, [class*="home"]')
+            away_team_elem = cell.select_one('[data-testid="away-team-name"], .away-team, [class*="away"]')
+            
+            if not home_team_elem or not away_team_elem:
+                # Essayer de trouver dans les liens
+                teams_link = cell.select_one('a[href*="/match/"]')
+                if teams_link:
+                    teams_text = teams_link.get_text(strip=True)
+                    if ' - ' in teams_text:
+                        home_name, away_name = teams_text.split(' - ', 1)
+                    elif ' vs ' in teams_text:
+                        home_name, away_name = teams_text.split(' vs ', 1)
+                    else:
+                        return None
+                else:
+                    return None
+            else:
+                home_name = home_team_elem.get_text(strip=True)
+                away_name = away_team_elem.get_text(strip=True)
+            
+            # Extraire l'ID du match depuis l'URL
+            match_link = cell.select_one('a[href*="/match/"]')
+            match_id = None
+            if match_link:
+                href = match_link.get('href', '')
+                match = re.search(r'/match/(\d+)', href)
+                if match:
+                    match_id = int(match.group(1))
+            
+            # Extraire l'heure du match
+            time_elem = cell.select_one('[data-testid="match-time"], .time, [class*="time"]')
+            match_time = None
+            if time_elem:
+                time_text = time_elem.get_text(strip=True)
+                try:
+                    # Convertir en timestamp
+                    match_time = int(datetime.strptime(time_text, '%H:%M').timestamp())
+                except:
+                    pass
+            
+            # Extraire le score
+            score_elem = cell.select_one('[data-testid="match-score"], .score, [class*="score"]')
+            home_score = None
+            away_score = None
+            if score_elem:
+                score_text = score_elem.get_text(strip=True)
+                if ' - ' in score_text or ':' in score_text:
+                    sep = ' - ' if ' - ' in score_text else ':'
+                    try:
+                        home_score, away_score = map(int, score_text.split(sep))
+                    except:
+                        pass
+            
+            return {
+                'id': match_id,
+                'homeTeam': {'name': home_name},
+                'awayTeam': {'name': away_name},
+                'startTimestamp': match_time,
+                'homeScore': {'current': home_score} if home_score is not None else None,
+                'awayScore': {'current': away_score} if away_score is not None else None,
+                'status': {'type': 'inprogress' if home_score is not None else 'notstarted'}
+            }
+            
+        except Exception as e:
+            logger.debug(f"Error extracting match from cell: {e}")
             return None
     
     def get_matches_for_date(self, date: datetime) -> List[Dict]:
@@ -185,7 +447,10 @@ class SofascoreScraper:
             
             # Filtrer les matchs de la ligue concernée
             for event in data.get('events', []):
-                if event.get('tournament', {}).get('uniqueTournament', {}).get('id') == league_info['id']:
+                tournament = event.get('tournament', {})
+                unique_tournament = tournament.get('uniqueTournament', {})
+                
+                if unique_tournament.get('id') == league_info['id']:
                     match_data = {
                         'id': event.get('id'),
                         'league': league_info['name'],
@@ -384,25 +649,30 @@ class SofascoreScraper:
         """
         all_matches = {}
         
-        for i in range(days):
-            date = datetime.now() + timedelta(days=i)
-            date_str = date.strftime('%Y-%m-%d')
-            
-            logger.info(f"=== Scraping matches for {date_str} ===")
-            matches = self.get_matches_for_date(date)
-            
-            # Enrichir chaque match
-            enriched_matches = []
-            for match in matches:
-                try:
-                    enriched = self.enrich_match_data(match)
-                    enriched_matches.append(enriched)
-                    # Délai entre les enrichissements
-                    simulate_human_delay(0.5, 1.5)
-                except Exception as e:
-                    logger.error(f"Error enriching match {match['id']}: {e}")
-                    enriched_matches.append(match)  # Ajouter sans enrichissement
-            
-            all_matches[date_str] = enriched_matches
+        try:
+            for i in range(days):
+                date = datetime.now() + timedelta(days=i)
+                date_str = date.strftime('%Y-%m-%d')
+                
+                logger.info(f"=== Scraping matches for {date_str} ===")
+                matches = self.get_matches_for_date(date)
+                
+                # Enrichir chaque match
+                enriched_matches = []
+                for match in matches:
+                    try:
+                        enriched = self.enrich_match_data(match)
+                        enriched_matches.append(enriched)
+                        # Délai entre les enrichissements
+                        simulate_human_delay(0.5, 1.5)
+                    except Exception as e:
+                        logger.error(f"Error enriching match {match['id']}: {e}")
+                        enriched_matches.append(match)  # Ajouter sans enrichissement
+                
+                all_matches[date_str] = enriched_matches
+        
+        finally:
+            # Toujours fermer Selenium à la fin
+            self._close_selenium()
         
         return all_matches

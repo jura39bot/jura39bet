@@ -34,12 +34,19 @@ from scrapers.oddsportal import OddsPortalScraper
 class BetIntelScraper:
     """Orchestrateur principal du scraping BetIntel."""
     
-    def __init__(self, config_path: str = "config/sources.json"):
+    def __init__(self, config_path: str = None):
         """Initialise l'orchestrateur avec les scrapers."""
-        self.config_path = config_path
-        self.sofascore = SofascoreScraper(config_path)
-        self.oddsportal = OddsPortalScraper(config_path)
-        self.data_dir = Path("data/raw")
+        # Détecter le répertoire du script pour les chemins relatifs
+        script_dir = Path(__file__).parent.absolute()
+        if config_path is None:
+            config_path = script_dir / "config" / "sources.json"
+        else:
+            config_path = script_dir / config_path
+        
+        self.config_path = str(config_path)
+        self.sofascore = SofascoreScraper(self.config_path)
+        self.oddsportal = OddsPortalScraper(self.config_path)
+        self.data_dir = script_dir / "data" / "raw"
         
     def ensure_data_dir(self, date_str: str) -> Path:
         """Crée le répertoire de données pour une date donnée."""

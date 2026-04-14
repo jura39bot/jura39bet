@@ -1,14 +1,14 @@
 {
-  "run_started_at": "2026-04-14T22:05:43.498880",
+  "run_started_at": "2026-04-14T22:15:47.275490",
   "days": 1,
   "include_odds": true,
   "results": {
     "2026-04-14": {
       "date": "2026-04-14",
-      "scraped_at": "2026-04-14T22:05:43.499034",
+      "scraped_at": "2026-04-14T22:15:47.275768",
       "matches": [],
       "total_matches": 0
     }
   },
-  "run_completed_at": "2026-04-14T22:05:52.910366"
+  "run_completed_at": "2026-04-14T22:17:17.091447"
 }
