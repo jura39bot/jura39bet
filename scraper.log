@@ -1,0 +1,56 @@
+2026-04-14 22:05:43,498 - __main__ - INFO - 
+############################################################
+2026-04-14 22:05:43,498 - __main__ - INFO - BETINTEL SCRAPER - Starting run
+2026-04-14 22:05:43,498 - __main__ - INFO - Days to scrape: 1
+2026-04-14 22:05:43,498 - __main__ - INFO - Include odds: True
+2026-04-14 22:05:43,498 - __main__ - INFO - ############################################################
+
+2026-04-14 22:05:43,498 - __main__ - INFO - 
+============================================================
+2026-04-14 22:05:43,498 - __main__ - INFO - SCRAPING DAY: 2026-04-14
+2026-04-14 22:05:43,499 - __main__ - INFO - ============================================================
+
+2026-04-14 22:05:43,499 - __main__ - INFO - Step 1: Fetching matches from Sofascore...
+2026-04-14 22:05:43,499 - scrapers.sofascore - INFO - Fetching matches for Premier League on 2026-04-14
+2026-04-14 22:05:44,429 - scrapers.sofascore - ERROR - Request failed for https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14: 403 Client Error: Forbidden for url: https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14
+2026-04-14 22:05:44,429 - scrapers.sofascore - WARNING - No data returned for Premier League
+2026-04-14 22:05:44,429 - scrapers.sofascore - INFO - Fetching matches for La Liga on 2026-04-14
+2026-04-14 22:05:44,605 - scrapers.sofascore - ERROR - Request failed for https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14: 403 Client Error: Forbidden for url: https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14
+2026-04-14 22:05:44,605 - scrapers.sofascore - WARNING - No data returned for La Liga
+2026-04-14 22:05:44,605 - scrapers.sofascore - INFO - Fetching matches for Serie A on 2026-04-14
+2026-04-14 22:05:45,613 - scrapers.sofascore - ERROR - Request failed for https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14: 403 Client Error: Forbidden for url: https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14
+2026-04-14 22:05:45,613 - scrapers.sofascore - WARNING - No data returned for Serie A
+2026-04-14 22:05:45,613 - scrapers.sofascore - INFO - Fetching matches for Ligue 1 on 2026-04-14
+2026-04-14 22:05:46,622 - scrapers.sofascore - ERROR - Request failed for https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14: 403 Client Error: Forbidden for url: https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14
+2026-04-14 22:05:46,622 - scrapers.sofascore - WARNING - No data returned for Ligue 1
+2026-04-14 22:05:46,622 - scrapers.sofascore - INFO - Fetching matches for Bundesliga on 2026-04-14
+2026-04-14 22:05:47,636 - scrapers.sofascore - ERROR - Request failed for https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14: 403 Client Error: Forbidden for url: https://api.sofascore.com/api/v1/sport/football/scheduled-events/2026-04-14
+2026-04-14 22:05:47,636 - scrapers.sofascore - WARNING - No data returned for Bundesliga
+2026-04-14 22:05:47,636 - scrapers.sofascore - INFO - Found 0 matches for 2026-04-14
+2026-04-14 22:05:47,636 - __main__ - INFO - Found 0 matches from Sofascore
+2026-04-14 22:05:47,637 - __main__ - INFO - Step 2: Enriching match data...
+2026-04-14 22:05:47,637 - __main__ - INFO - Step 3: Fetching odds from OddsPortal...
+2026-04-14 22:05:47,637 - scrapers.oddsportal - INFO - === Scraping odds for Premier League ===
+2026-04-14 22:05:47,637 - scrapers.oddsportal - INFO - Fetching odds from https://www.oddsportal.com/soccer/england/premier-league/2026-04-14/
+2026-04-14 22:05:49,207 - scrapers.oddsportal - ERROR - Request failed for https://www.oddsportal.com/soccer/england/premier-league/2026-04-14/: 404 Client Error: Not Found for url: https://www.oddsportal.com/football/england/premier-league/2026-04-14/
+2026-04-14 22:05:49,207 - scrapers.oddsportal - INFO - === Scraping odds for La Liga ===
+2026-04-14 22:05:49,208 - scrapers.oddsportal - INFO - Fetching odds from https://www.oddsportal.com/soccer/spain/laliga/2026-04-14/
+2026-04-14 22:05:49,508 - scrapers.oddsportal - ERROR - Request failed for https://www.oddsportal.com/soccer/spain/laliga/2026-04-14/: 404 Client Error: Not Found for url: https://www.oddsportal.com/football/spain/laliga/2026-04-14/
+2026-04-14 22:05:49,509 - scrapers.oddsportal - INFO - === Scraping odds for Serie A ===
+2026-04-14 22:05:49,509 - scrapers.oddsportal - INFO - Fetching odds from https://www.oddsportal.com/soccer/italy/serie-a/2026-04-14/
+2026-04-14 22:05:50,688 - scrapers.oddsportal - ERROR - Request failed for https://www.oddsportal.com/soccer/italy/serie-a/2026-04-14/: 404 Client Error: Not Found for url: https://www.oddsportal.com/football/italy/serie-a/2026-04-14/
+2026-04-14 22:05:50,689 - scrapers.oddsportal - INFO - === Scraping odds for Ligue 1 ===
+2026-04-14 22:05:50,689 - scrapers.oddsportal - INFO - Fetching odds from https://www.oddsportal.com/soccer/france/ligue-1/2026-04-14/
+2026-04-14 22:05:51,518 - scrapers.oddsportal - ERROR - Request failed for https://www.oddsportal.com/soccer/france/ligue-1/2026-04-14/: 404 Client Error: Not Found for url: https://www.oddsportal.com/football/france/ligue-1/2026-04-14/
+2026-04-14 22:05:51,518 - scrapers.oddsportal - INFO - === Scraping odds for Bundesliga ===
+2026-04-14 22:05:51,518 - scrapers.oddsportal - INFO - Fetching odds from https://www.oddsportal.com/soccer/germany/bundesliga/2026-04-14/
+2026-04-14 22:05:52,908 - scrapers.oddsportal - ERROR - Request failed for https://www.oddsportal.com/soccer/germany/bundesliga/2026-04-14/: 404 Client Error: Not Found for url: https://www.oddsportal.com/football/germany/bundesliga/2026-04-14/
+2026-04-14 22:05:52,908 - __main__ - INFO - Step 4: Saving data...
+2026-04-14 22:05:52,909 - __main__ - INFO - Data saved to data/raw/2026-04-14/matches_2026-04-14.json
+2026-04-14 22:05:52,910 - __main__ - INFO - Data saved to data/raw/2026-04-14/summary_2026-04-14.json
+2026-04-14 22:05:52,911 - __main__ - INFO - Data saved to data/raw/2026-04-14/full_report.json
+2026-04-14 22:05:52,911 - __main__ - INFO - 
+############################################################
+2026-04-14 22:05:52,911 - __main__ - INFO - SCRAPING COMPLETED
+2026-04-14 22:05:52,911 - __main__ - INFO - ############################################################
+

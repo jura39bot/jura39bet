@@ -7,10 +7,23 @@ Récupère les statistiques d'équipes, forme récente et H2H depuis Sofascore.
 import json
 import logging
 import time
+import random
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import requests
 from pathlib import Path
+
+# Import des utilitaires anti-détection
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils.scraper_utils import (
+    get_random_headers,
+    simulate_human_delay,
+    retry_with_backoff,
+    get_session_cookies,
+    RequestThrottler,
+    parse_response_status
+)
 
 logger = logging.getLogger(__name__)
 
@@ -22,13 +35,21 @@ class SofascoreScraper:
         """Initialise le scraper avec la configuration."""
         self.config = self._load_config(config_path)
         self.base_url = self.config['sofascore']['api_url']
+        
+        # Configuration retry
+        self.retry_config = self.config.get('retry', {})
+        self.max_retries = self.retry_config.get('max_retries', 3)
+        self.timeout = self.retry_config.get('timeout', 30)
+        
+        # Session avec headers anti-détection
         self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.0',
-            'Accept': 'application/json',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Referer': 'https://www.sofascore.com/'
-        })
+        self._rotate_headers()
+        
+        # Throttler pour les délais
+        retry_delay_min = self.retry_config.get('min_delay', 1.0)
+        retry_delay_max = self.retry_config.get('max_delay', 5.0)
+        self.throttler = RequestThrottler(min_delay=retry_delay_min, max_delay=retry_delay_max)
+        
         self.last_request_time = 0
         self.rate_limit_delay = self.config.get('rate_limit', {}).get('delay_between_requests', 1.0)
         
@@ -44,24 +65,95 @@ class SofascoreScraper:
             logger.error(f"Invalid JSON in config file: {e}")
             raise
     
+    def _rotate_headers(self, referer: Optional[str] = None):
+        """Rotation des headers pour éviter la détection."""
+        extra_headers = {
+            'Origin': 'https://www.sofascore.com',
+            'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Windows"',
+        }
+        headers = get_random_headers(referer=referer, extra_headers=extra_headers)
+        self.session.headers.update(headers)
+        logger.debug(f"Rotated headers with User-Agent: {headers['User-Agent'][:50]}...")
+    
     def _rate_limit(self):
-        """Gère le rate limiting (1 req/sec max)."""
+        """Gère le rate limiting avec délai aléatoire."""
         elapsed = time.time() - self.last_request_time
+        min_delay = self.retry_config.get('min_delay', 1.0)
+        max_delay = self.retry_config.get('max_delay', 5.0)
+        
         if elapsed < self.rate_limit_delay:
-            sleep_time = self.rate_limit_delay - elapsed
+            sleep_time = random.uniform(min_delay, max_delay)
             logger.debug(f"Rate limiting: sleeping {sleep_time:.2f}s")
             time.sleep(sleep_time)
         self.last_request_time = time.time()
     
-    def _make_request(self, url: str, params: Optional[Dict] = None) -> Optional[Dict]:
-        """Effectue une requête HTTP avec gestion des erreurs."""
+    def _make_request(self, url: str, params: Optional[Dict] = None, attempt: int = 0) -> Optional[Dict]:
+        """
+        Effectue une requête HTTP avec gestion des erreurs et retry.
+        
+        Args:
+            url: URL de la requête
+            params: Paramètres de la requête
+            attempt: Numéro de tentative actuel
+            
+        Returns:
+            Données JSON ou None en cas d'échec
+        """
         self._rate_limit()
+        
+        # Rotation des headers à chaque tentative
+        if attempt > 0:
+            self._rotate_headers(referer='https://www.sofascore.com/')
+            simulate_human_delay(1.0, 3.0)
+        
         try:
-            response = self.session.get(url, params=params, timeout=30)
+            # Ajout de cookies de session
+            cookies = get_session_cookies('sofascore.com')
+            
+            response = self.session.get(
+                url, 
+                params=params, 
+                timeout=self.timeout,
+                cookies=cookies,
+                allow_redirects=True
+            )
+            
+            # Log des informations de réponse
+            status_info = parse_response_status(response)
+            logger.debug(f"Response status: {status_info['status_code']} for {url}")
+            
+            # Gestion des codes d'erreur
+            if response.status_code == 403:
+                logger.warning(f"403 Forbidden for {url} - attempt {attempt + 1}/{self.max_retries}")
+                if attempt < self.max_retries - 1:
+                    # Backoff exponentiel
+                    delay = min(2 ** attempt, 30)
+                    logger.info(f"Retrying in {delay}s...")
+                    time.sleep(delay)
+                    return self._make_request(url, params, attempt + 1)
+                return None
+            
+            if response.status_code == 429:
+                logger.warning(f"429 Rate Limited for {url}")
+                if attempt < self.max_retries - 1:
+                    delay = min(2 ** (attempt + 2), 60)
+                    logger.info(f"Rate limited, waiting {delay}s...")
+                    time.sleep(delay)
+                    return self._make_request(url, params, attempt + 1)
+                return None
+            
             response.raise_for_status()
             return response.json()
+            
         except requests.exceptions.RequestException as e:
             logger.error(f"Request failed for {url}: {e}")
+            if attempt < self.max_retries - 1:
+                delay = min(2 ** attempt, 30)
+                logger.info(f"Retrying in {delay}s...")
+                time.sleep(delay)
+                return self._make_request(url, params, attempt + 1)
             return None
         except json.JSONDecodeError as e:
             logger.error(f"JSON decode error for {url}: {e}")
@@ -108,6 +200,9 @@ class SofascoreScraper:
                         'season': event.get('season', {}).get('year'),
                     }
                     matches.append(match_data)
+            
+            # Délai aléatoire entre les ligues
+            simulate_human_delay(1.0, 2.0)
         
         logger.info(f"Found {len(matches)} matches for {date_str}")
         return matches
@@ -302,6 +397,8 @@ class SofascoreScraper:
                 try:
                     enriched = self.enrich_match_data(match)
                     enriched_matches.append(enriched)
+                    # Délai entre les enrichissements
+                    simulate_human_delay(0.5, 1.5)
                 except Exception as e:
                     logger.error(f"Error enriching match {match['id']}: {e}")
                     enriched_matches.append(match)  # Ajouter sans enrichissement
