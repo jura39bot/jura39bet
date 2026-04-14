@@ -1,0 +1,67 @@
+{
+  "sofascore": {
+    "base_url": "https://www.sofascore.com",
+    "api_url": "https://api.sofascore.com/api/v1",
+    "leagues": {
+      "premier_league": {
+        "id": 17,
+        "name": "Premier League",
+        "country": "England",
+        "slug": "premier-league"
+      },
+      "la_liga": {
+        "id": 8,
+        "name": "La Liga",
+        "country": "Spain",
+        "slug": "la-liga"
+      },
+      "serie_a": {
+        "id": 23,
+        "name": "Serie A",
+        "country": "Italy",
+        "slug": "serie-a"
+      },
+      "ligue_1": {
+        "id": 34,
+        "name": "Ligue 1",
+        "country": "France",
+        "slug": "ligue-1"
+      },
+      "bundesliga": {
+        "id": 35,
+        "name": "Bundesliga",
+        "country": "Germany",
+        "slug": "bundesliga"
+      }
+    }
+  },
+  "oddsportal": {
+    "base_url": "https://www.oddsportal.com",
+    "leagues": {
+      "premier_league": {
+        "path": "/soccer/england/premier-league/",
+        "name": "Premier League"
+      },
+      "la_liga": {
+        "path": "/soccer/spain/laliga/",
+        "name": "La Liga"
+      },
+      "serie_a": {
+        "path": "/soccer/italy/serie-a/",
+        "name": "Serie A"
+      },
+      "ligue_1": {
+        "path": "/soccer/france/ligue-1/",
+        "name": "Ligue 1"
+      },
+      "bundesliga": {
+        "path": "/soccer/germany/bundesliga/",
+        "name": "Bundesliga"
+      }
+    }
+  },
+  "rate_limit": {
+    "requests_per_second": 1,
+    "delay_between_requests": 1.0
+  }
+}
